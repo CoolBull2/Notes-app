@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { notesAPI } from '../services/api';
-
+import React from 'react';
 const NoteCard = ({ note, onNoteUpdated, onNoteDeleted }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(note.title);
