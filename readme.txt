@@ -4,6 +4,7 @@
 cd backend
 uvicorn app.main:app --reload
 # start frontend (Second terminal)
+cd frontend
 npm run dev
 
 # What to do 

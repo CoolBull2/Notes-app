@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { authAPI } from '../services/api';
-import React from 'react';
 
 const useAuthStore = create((set, get) => ({
   user: null,
@@ -15,13 +14,13 @@ const useAuthStore = create((set, get) => ({
     try {
       const response = await authAPI.login(credentials);
       const { access_token } = response.data;
-      
+
       // Store token
       localStorage.setItem('token', access_token);
-      
+
       // Get user info
       const userResponse = await authAPI.getCurrentUser();
-      
+
       set({
         token: access_token,
         user: userResponse.data,
@@ -29,10 +28,12 @@ const useAuthStore = create((set, get) => ({
         isLoading: false,
         error: null,
       });
-      
+
       return { success: true };
     } catch (error) {
       const errorMessage = error.response?.data?.detail || 'Login failed';
+      console.log('Setting error:', errorMessage); // ✅ Debug log
+
       set({
         error: errorMessage,
         isLoading: false,
@@ -40,6 +41,7 @@ const useAuthStore = create((set, get) => ({
         user: null,
         token: null,
       });
+
       localStorage.removeItem('token');
       return { success: false, error: errorMessage };
     }
@@ -50,20 +52,23 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await authAPI.register(userData);
-      
+
       // Auto-login after registration
       const loginResult = await get().login({
         username: userData.username,
         password: userData.password,
       });
-      
+
       return loginResult;
     } catch (error) {
       const errorMessage = error.response?.data?.detail || 'Registration failed';
+      console.log('Setting error:', errorMessage); // ✅ Debug log
+
       set({
         error: errorMessage,
         isLoading: false,
       });
+
       return { success: false, error: errorMessage };
     }
   },
@@ -103,7 +108,10 @@ const useAuthStore = create((set, get) => ({
   },
 
   // Clear error
-  clearError: () => set({ error: null }),
+  clearError: () => {
+    console.log('Clearing error'); // ✅ Debug log
+    set({ error: null });
+  },
 }));
 
 export default useAuthStore;

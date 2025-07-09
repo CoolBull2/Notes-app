@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
@@ -8,24 +8,36 @@ const Login = () => {
     username: '',
     password: '',
   });
-  
+
+  const [localError, setLocalError] = useState(null); // ✅ local state
   const { login, isLoading, error, clearError } = useAuthStore();
   const navigate = useNavigate();
 
+  // Sync Zustand error to localError when it changes
+  useEffect(() => {
+    if (error) {
+      setLocalError(error);
+    }
+  }, [error]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+
     // Clear error when user starts typing
-    if (error) clearError();
+    if (localError) {
+      setLocalError(null);
+      clearError();
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await login(formData);
-    
+
     if (result.success) {
       navigate('/notes');
     }
@@ -48,7 +60,7 @@ const Login = () => {
             </Link>
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -83,9 +95,9 @@ const Login = () => {
             </div>
           </div>
 
-          {error && (
+          {localError && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-              {error}
+              {localError}
             </div>
           )}
 
